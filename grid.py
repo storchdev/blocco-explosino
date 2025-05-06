@@ -53,10 +53,19 @@ class Grid:
     def __str__(self):
         """binary string representation"""
 
-        lines = []
+        mapping = ['.', 'o']
+        ascii_grid = ['.'] * (self.length ** 2)
+
         for i in range(self.length):
-            lines.append(''.join(str(b) for b in self.grid[i]))
-        return '\n'.join(lines)
+            for j in range(self.length):
+                ascii_grid[j*self.length + i] = mapping[self.grid[i][j]]
+
+        string = []
+        for i, char in enumerate(ascii_grid):
+            if i > 0 and i % self.length == 0:
+                string.append('\n')
+            string.append(char)
+        return ''.join(string)
 
     @classmethod
     def empty(cls):
@@ -170,14 +179,14 @@ class Grid:
                     if (c2x - c1x) ** 2 + (c2y - c1y) ** 2 < thresh:
                         neighbor = coords.pop(i)
                         block.append(neighbor)
-                        queue.append(neighbor)  # 👈 key fix: keep checking its neighbors
+                        queue.append(neighbor)
                     else:
                         i += 1
 
             blocks.append(Block.from_raw_coords(block, s))
 
-        if len(blocks) < 3:
-            print('Not enough blocks detected in screenshot.')
+        if len(blocks) != 3:
+            print('There must be exactly 3 blocks detected in screenshot. Check vision.png to see what the computer saw.')
             sys.exit(1)
 
         print(f'{len(filtered_boxes)} squares, {len(blocks)} blocks detected')
@@ -226,10 +235,12 @@ class Grid:
         """returns an ascii string highlighting the block if it were placed at a position"""
 
         ascii_grid = ['.'] * (self.length**2)
+        # use transposed coordinates (swap i and j) for ascii_grid
+
         for i in range(self.length):
             for j in range(self.length):
                 if self.grid[i][j] == 1:
-                    ascii_grid[j*self.length + i] = '+'
+                    ascii_grid[j*self.length + i] = 'o'
         
         for x, y in block.coords:
             ascii_grid[(ij[0]+x) + (ij[1]+y)*self.length] = '@'

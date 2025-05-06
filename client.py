@@ -18,7 +18,9 @@ with open('calibration.txt') as f:
         sys.exit(1)
 
 with open('grid.txt') as f:
-    bits = [int(c) for c in f.read() if c == '0' or c == '1']
+    mapping = {'.': 0, 'o': 1}
+    bits = [mapping[c] for c in f.read() if c == '.' or c == 'o']
+
     if len(bits) != 64:
         grid = Grid.empty()
     else:
@@ -27,14 +29,11 @@ with open('grid.txt') as f:
         grid = Grid([[raw_matrix[j][i] for j in range(8)] for i in range(8)])
 
 while True:
-    print('--- PRESS ENTER FOR NEXT ROUND, S TO SAVE ---')
-    cmd = input()
+    print('--- PRESS ENTER FOR NEXT ROUND---')
+    input()
 
-    if cmd.lower() in ['s', 'save']:
-        with open('grid.txt', 'w') as f:
-            f.write(str(grid))
-        sys.exit(0)
-
+    with open('grid.txt', 'w') as f:
+        f.write(str(grid))
 
     ss = cv2.cvtColor(np.array(pyautogui.screenshot(region=(x, y, x1 - x, y1 - y))), cv2.COLOR_RGB2GRAY)
     moves = grid.get_best_moves(ss, s)
