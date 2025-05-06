@@ -96,18 +96,28 @@ class Grid:
                 raise RuntimeError("not a valid move")
             self.grid[i+x][j+y] = 1
 
-        # scan for vertical or horizontal runs
+        # clear vertical and horizontal runs simultaneously
+
+        rows_to_clear = set()
+        cols_to_clear = set()
 
         for i in range(self.length):
             if all(cell == 1 for cell in self.grid[i]):
-                for j in range(self.length):
-                    self.grid[i][j] = 0
+                rows_to_clear.add(i)
 
         for j in range(self.length):
-            if all(row[j] == 1 for row in self.grid):
-                for row in self.grid:
-                    row[j] = 0
-        
+            if all(self.grid[i][j] == 1 for i in range(self.length)):
+                cols_to_clear.add(j)
+
+        # Step 2: Clear them
+        for i in rows_to_clear:
+            for j in range(self.length):
+                self.grid[i][j] = 0
+
+        for j in cols_to_clear:
+            for i in range(self.length):
+                self.grid[i][j] = 0 
+
     def get_perimeter(self):
         """returns the total perimeter of the stuff inside the grid (not including grid edges)"""
         perimeter = 0
