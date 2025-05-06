@@ -22,25 +22,28 @@ with open('grid.txt') as f:
     if len(bits) != 64:
         grid = Grid.empty()
     else:
-        grid = Grid([bits[i:i+8] for i in range(0, 64, 8)])
+        raw_matrix = [bits[i:i+8] for i in range(0, 64, 8)]  
+        # transpose, so that i = x-axis and j = y-axis
+        grid = Grid([[raw_matrix[j][i] for j in range(8)] for i in range(8)])
 
 while True:
-    # try:
-    #     input()
-    # except KeyboardInterrupt:
-    #     with open('grid.txt', 'w') as f:
-    #         f.write(str(grid))
-    #     sys.exit(0)
-    input()
+    print('--- PRESS ENTER FOR NEXT ROUND, S TO SAVE ---')
+    cmd = input()
+
+    if cmd.lower() in ['s', 'save']:
+        with open('grid.txt', 'w') as f:
+            f.write(str(grid))
+        sys.exit(0)
+
 
     ss = cv2.cvtColor(np.array(pyautogui.screenshot(region=(x, y, x1 - x, y1 - y))), cv2.COLOR_RGB2GRAY)
     moves = grid.get_best_moves(ss, s)
 
     for block, move in moves:
+        # print(block)
+        # print(move)
+        # print('---')
         grid.apply_move(block, move)
+        print(grid.display_move(block, move))
+        print()
     
-    print(grid.display_moves(moves))
-    
-    # TODO
-
-
